@@ -5,14 +5,16 @@ import pandas as pd
 
 from algorithms.EvolutionStrategy import ES
 from algorithms.GeneticAlgorithm import GA
-from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock
+from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6
 from base.BaseAlgorithm import Individual
 
 FUNCTIONS = {
     "Sphere": Sphere(),
     "Rastrigin": Rastrigin(),
     "Griewank": Griewank(),
-    "Rosenbrock": Rosenbrock()
+    "Rosenbrock": Rosenbrock(),
+    "Beale": Beale(),
+    "Bukin N.6": BukinN6()
 }
 
 st.set_page_config(layout="centered", page_title="Porównanie Algorytmów")
@@ -31,12 +33,26 @@ with st.sidebar:
 
     st.divider()
     st.header("3. Parametry Problemu")
-    dim = st.slider("Wymiar (D)", 1, 20, 2)
+
+    if selected_func_name in ["Beale", "Bukin N.6"]:
+        st.warning(f"Funkcja {selected_func_name} jest zdefiniowana tylko dla 2 wymiarów.")
+        dim = 2
+    else:
+        dim = st.slider("Wymiar (D)", 1, 20, 2)
+
+    default_low = -5.0
+    default_high = 5.0
+
+    if selected_func_name == "Bukin N.6":
+        default_low = -15.0
+        default_high = 5.0
+        st.info("Dla funkcji Bukin N.6 zalecany zakres zmiennych to [-15, 5].")
+
     col1, col2 = st.columns(2)
     with col1:
-        low = st.number_input("Min (Low)", value=-5.0)
+        low = st.number_input("Min (Low)", value=default_low)
     with col2:
-        high = st.number_input("Max (High)", value=5.0)
+        high = st.number_input("Max (High)", value=default_high)
 
     max_iter = st.number_input("Liczba Generacji", 10, 1000, 100)
 

@@ -22,4 +22,16 @@ class Griewank:
         cos_arg = x/np.sqrt(id)
         prod_part = np.prod(np.cos(cos_arg))
         return 1 + (1/4000) * sum_part - prod_part
-        
+
+class Beale:
+    def __call__(self, x):
+        term1 = (1.5 - x[0] + x[0]*x[1])**2
+        term2 = (2.25 - x[0] + x[0]*(x[1])**2)**2
+        term3 = (2.625 - x[0] + x[0]*(x[1])**3)**2
+        return term1 + term2 + term3
+
+class BukinN6:
+    def __call__(self, x):
+        term1 = 100 * np.sqrt(np.abs(x[1] - 0.01*(x[0])**2))
+        term2 = 0.01 * np.abs(x[0] + 10)
+        return term1 + term2
