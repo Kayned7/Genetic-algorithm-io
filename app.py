@@ -1,12 +1,21 @@
-# app.py
 import streamlit as st
 import numpy as np
 import pandas as pd
-
 from algorithms.EvolutionStrategy import ES
 from algorithms.GeneticAlgorithm import GA
 from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6
 from base.BaseAlgorithm import Individual
+
+def format_genom(genom, precision=6):
+    """Konwertuje tablicę NumPy (genom) na string z notacją naukową."""
+    return np.array2string(
+        genom, 
+        formatter={'float_kind': lambda x: f'{x:.{precision}e}'},
+        precision=precision,
+        separator=', ',
+        max_line_width=100
+    )
+
 
 FUNCTIONS = {
     "Sphere": Sphere(),
@@ -30,6 +39,10 @@ with st.sidebar:
     st.header("2. Wybierz Funkcję Celu")
     selected_func_name = st.selectbox("Funkcja", list(FUNCTIONS.keys()))
     func = FUNCTIONS[selected_func_name]
+    
+    if selected_func_name == 'Griewank':
+        st.caption("Przykład funkcji z wieloma lokalnymi minimami.")
+        # 
 
     st.divider()
     st.header("3. Parametry Problemu")
@@ -73,6 +86,7 @@ with st.sidebar:
         params['crossover_prob'] = st.slider("Prawdopodobieństwo krzyżowania", 0.0, 1.0, 0.8)
         params['tournament_size'] = st.slider("Rozmiar turnieju", 2, 10, 3)
 
+
 if st.button("▶️ Uruchom Optymalizację", type="primary"):
     st.subheader(f"Wyniki: {alg_type} na funkcji {selected_func_name}")
 
@@ -92,6 +106,11 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
             tournament_size=params['tournament_size']
         )
 
+    if runner is None:
+        st.error("Wystąpił błąd inicjalizacji algorytmu.")
+        st.stop()
+
+
     progress_bar = st.progress(0, text="Inicjalizacja...")
 
     final_best_individual = runner.run_with_progress(progress_bar)
@@ -106,7 +125,9 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
 
     with col_res2:
         st.caption("Znalezione współrzędne (Genom):")
-        st.code(str(np.round(final_best_individual.genom, 4)), language='python')
+        
+        formatted_genom = format_genom(final_best_individual.genom, precision=6)
+        st.code(formatted_genom, language='python')
 
     st.subheader("📉 Historia Konwergencji")
 
@@ -123,13 +144,16 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
 
         detailed_history_data = []
         for i, ind_obj in enumerate(runner.history):
+
+            formatted_genom_table = format_genom(ind_obj.genom, precision=6)
+            
             row = {
                 "Generacja": i,
                 "Fitness": f"{ind_obj.fitness:.6e}",
-                "Genom (x)": str(np.round(ind_obj.genom, 4)),
+                "Genom (x)": formatted_genom_table,
             }
             if ind_obj.sigma is not None:
-                row["Sigma"] = f"{ind_obj.sigma:.4f}"
+                row["Sigma"] = f"{ind_obj.sigma:.6e}" 
             else:
                 row["Sigma"] = "-"
 
