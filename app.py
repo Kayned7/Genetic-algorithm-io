@@ -136,4 +136,4 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
             detailed_history_data.append(row)
 
         detailed_history_df = pd.DataFrame(detailed_history_data)
-        st.dataframe(detailed_history_df, use_container_width=True)
+        st.dataframe(detailed_history_df, width='stretch')
