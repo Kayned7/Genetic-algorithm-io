@@ -3,13 +3,11 @@ import streamlit as st
 import numpy as np
 import pandas as pd
 
-# Importowanie z poprawnych ścieżek pakietów:
-# Upewnij się, że te importy są poprawne w stosunku do Twojej struktury folderów
-from algorithms.EvolutionStrategy import ES 
-from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock 
-from base.BaseAlgorithm import Individual # Nadal potrzebujemy Individual do history
+from algorithms.EvolutionStrategy import ES
+from algorithms.GeneticAlgorithm import GA
+from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock
+from base.BaseAlgorithm import Individual
 
-# Mapowanie nazw funkcji na instancje klas callable
 FUNCTIONS = {
     "Sphere": Sphere(),
     "Rastrigin": Rastrigin(),
@@ -17,83 +15,109 @@ FUNCTIONS = {
     "Rosenbrock": Rosenbrock()
 }
 
-st.set_page_config(layout="centered", page_title="Prosty ES w Streamlit")
+st.set_page_config(layout="centered", page_title="Porównanie Algorytmów")
 
-st.title("🔬 Prosty Optymalizator ES")
-st.markdown("Uruchom algorytm Evolution Strategy (ES) i zobacz najlepsze wyniki z każdej generacji.")
+st.title("🔬 Platforma Badawcza Algorytmów")
+st.markdown("Wybierz algorytm (ES lub GA), skonfiguruj parametry i porównaj wyniki.")
 
-# --- SIDEBAR: Ustawienia Algorytmu i Problemu ---
 with st.sidebar:
-    st.header("Konfiguracja Algorytmu")
+    st.header("1. Wybierz Algorytm")
+    alg_type = st.selectbox("Algorytm optymalizacyjny", ["Evolution Strategy (ES)", "Genetic Algorithm (GA)"])
 
-    # Wybór funkcji
-    selected_func_name = st.selectbox("Wybierz funkcję celu", list(FUNCTIONS.keys()))
+    st.divider()
+    st.header("2. Wybierz Funkcję Celu")
+    selected_func_name = st.selectbox("Funkcja", list(FUNCTIONS.keys()))
     func = FUNCTIONS[selected_func_name]
 
-    # Parametry Problemowe
-    dim = st.slider("Wymiar (D)", 1, 10, 2) # Zmniejszyłem D dla prostoty
-    low = st.number_input("Dolna granica (Low)", value=-5.0)
-    high = st.number_input("Górna granica (High)", value=5.0)
+    st.divider()
+    st.header("3. Parametry Problemu")
+    dim = st.slider("Wymiar (D)", 1, 20, 2)
+    col1, col2 = st.columns(2)
+    with col1:
+        low = st.number_input("Min (Low)", value=-5.0)
+    with col2:
+        high = st.number_input("Max (High)", value=5.0)
 
-    st.subheader("Parametry ES")
-    mu = st.slider("μ (Liczba rodziców)", 2, 10, 5) # Uproszczone wartości
-    lam = st.slider("λ (Liczba dzieci)", 5, 50, 20)
-    max_iter = st.number_input("Maks. Liczba Generacji", 10, 500, 100) # Uproszczone wartości
+    max_iter = st.number_input("Liczba Generacji", 10, 1000, 100)
 
-# --- GŁÓWNA LOGIKA URUCHOMIENIOWA ---
-if st.button("▶️ Uruchom Optymalizację"):
-    st.subheader(f"Wyniki dla: **{selected_func_name}**")
-    
-    # 1. Inicjalizacja Algorytmu
-    es_runner = ES(
-        mu=mu, lam=lam, max_iter=max_iter, 
-        func=func, dim=dim, low=low, high=high
-    )
-    
-    # 2. Uruchomienie z Paskiem Postępu
-    progress_bar = st.progress(0, text="Rozpoczynam optymalizację...")
-    
-    # Zwraca najlepszy obiekt Individual
-    final_best_individual = es_runner.run_with_progress(progress_bar) 
-    
-    # 3. Wyświetlanie Końcowych Wyników
+    st.divider()
+    st.header("4. Parametry Algorytmu")
+
+    params = {}
+
+    if alg_type == "Evolution Strategy (ES)":
+        st.info("Ustawienia dla ES")
+        params['mu'] = st.slider("μ (Rodzice)", 2, 50, 5)
+        params['lam'] = st.slider("λ (Potomstwo)", 5, 100, 20)
+
+    elif alg_type == "Genetic Algorithm (GA)":
+        st.info("Ustawienia dla GA")
+        params['pop_size'] = st.slider("Rozmiar populacji", 10, 200, 80)
+        params['mutation_prob'] = st.slider("Prawdopodobieństwo mutacji", 0.0, 1.0, 0.1)
+        params['crossover_prob'] = st.slider("Prawdopodobieństwo krzyżowania", 0.0, 1.0, 0.8)
+        params['tournament_size'] = st.slider("Rozmiar turnieju", 2, 10, 3)
+
+if st.button("▶️ Uruchom Optymalizację", type="primary"):
+    st.subheader(f"Wyniki: {alg_type} na funkcji {selected_func_name}")
+
+    runner = None
+
+    if alg_type == "Evolution Strategy (ES)":
+        runner = ES(
+            func=func, dim=dim, low=low, high=high, max_iter=max_iter,
+            mu=params['mu'], lam=params['lam']
+        )
+    elif alg_type == "Genetic Algorithm (GA)":
+        runner = GA(
+            func=func, dim=dim, low=low, high=high, max_iter=max_iter,
+            pop_size=params['pop_size'],
+            mutation_prob=params['mutation_prob'],
+            crossover_prob=params['crossover_prob'],
+            tournament_size=params['tournament_size']
+        )
+
+    progress_bar = st.progress(0, text="Inicjalizacja...")
+
+    final_best_individual = runner.run_with_progress(progress_bar)
+
     st.success("Optymalizacja zakończona!")
-    
-    st.write("---")
-    st.subheader("Najlepsze Rozwiązanie Globalne:")
-    st.metric(label="Fitness", value=f"{final_best_individual.fitness:.6e}")
-    st.code(f"Genom (x): {final_best_individual.genom}", language='python')
-    st.write("---")
 
-    # 4. Wykres Konwergencji (Historia Fitness)
-    st.subheader("Historia Konwergencji (Najlepszy Fitness w Generacji)")
-    
-    # Przekształcanie listy obiektów Individual na DataFrame
-    # Tworzymy listę słowników dla DataFrame
+    st.write("---")
+    col_res1, col_res2 = st.columns([1, 2])
+
+    with col_res1:
+        st.metric(label="Najlepszy Fitness (min)", value=f"{final_best_individual.fitness:.6e}")
+
+    with col_res2:
+        st.caption("Znalezione współrzędne (Genom):")
+        st.code(str(np.round(final_best_individual.genom, 4)), language='python')
+
+    st.subheader("📉 Historia Konwergencji")
+
     history_data_for_df = [
         {"Generacja": i, "Najlepszy Fitness": ind.fitness}
-        for i, ind in enumerate(es_runner.history)
+        for i, ind in enumerate(runner.history)
     ]
     history_df = pd.DataFrame(history_data_for_df)
-    
+
     st.line_chart(history_df.set_index('Generacja'))
 
-    # 5. Wyświetlanie Najlepszych Obiektów z Iteracji
-    st.subheader("Najlepsze Obiekty z Każdej Generacji")
-    st.write("Tabela przedstawia najlepszy obiekt (genom i fitness) z każdej iteracji algorytmu.")
+    with st.expander("📊 Zobacz szczegółową tabelę wyników"):
+        st.write("Tabela przedstawia najlepszy obiekt z każdej iteracji algorytmu.")
 
-    # Tworzymy listę słowników dla DataFrame, pokazującą szczegóły każdego obiektu
-    detailed_history_data = []
-    for i, ind_obj in enumerate(es_runner.history):
-        detailed_history_data.append({
-            "Generacja": i,
-            "Fitness": f"{ind_obj.fitness:.6e}",
-            "Genom (x)": str(ind_obj.genom), # Konwertujemy NumPy array na string
-            "Sigma": f"{ind_obj.sigma:.4f}" if ind_obj.sigma is not None else "N/A"
-        })
-    
-    # Tworzymy DataFrame i wyświetlamy go
-    detailed_history_df = pd.DataFrame(detailed_history_data)
-    
-    # Streamlit może wyświetlić duże tabele, ale dla bardzo wielu iteracji może być to nieefektywne
-    st.dataframe(detailed_history_df)
+        detailed_history_data = []
+        for i, ind_obj in enumerate(runner.history):
+            row = {
+                "Generacja": i,
+                "Fitness": f"{ind_obj.fitness:.6e}",
+                "Genom (x)": str(np.round(ind_obj.genom, 4)),
+            }
+            if ind_obj.sigma is not None:
+                row["Sigma"] = f"{ind_obj.sigma:.4f}"
+            else:
+                row["Sigma"] = "-"
+
+            detailed_history_data.append(row)
+
+        detailed_history_df = pd.DataFrame(detailed_history_data)
+        st.dataframe(detailed_history_df, use_container_width=True)
