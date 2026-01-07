@@ -1,5 +1,13 @@
 import numpy as np
 
+class EvalOnGrid:
+    def eval_on_grid(f, X, Y):
+        Z = np.zeros_like(X)
+        for i in range(X.shape[0]):
+            for j in range(X.shape[1]):
+                Z[i, j] = f(np.array([X[i, j], Y[i, j]]))
+        return Z
+
 class Sphere:
     def __call__(self, x):
         return np.sum(x**2)

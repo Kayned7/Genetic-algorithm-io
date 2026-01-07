@@ -2,10 +2,12 @@
 import streamlit as st
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 
 from algorithms.EvolutionStrategy import ES
 from algorithms.GeneticAlgorithm import GA
-from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6
+from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6, EvalOnGrid
 from base.BaseAlgorithm import Individual
 
 FUNCTIONS = {
@@ -137,3 +139,67 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
 
         detailed_history_df = pd.DataFrame(detailed_history_data)
         st.dataframe(detailed_history_df, width='stretch')
+
+    x = np.linspace(low, high, 300)
+    y = np.linspace(low, high, 300)
+    X, Y = np.meshgrid(x, y)
+
+    Z = EvalOnGrid.eval_on_grid(func, X, Y)
+
+    fig, ax = plt.subplots(figsize=(6, 5))
+    cs = ax.contourf(X, Y, Z, levels=50, cmap="viridis")
+    fig.colorbar(cs)
+    ax.scatter(
+        final_best_individual.genom[0],
+        final_best_individual.genom[1],
+        color="red",
+        s=2,
+        marker=".",
+        label="Najlepsze rozwiązanie"
+    )
+    ax.set_title("Wykres funkcji")
+    ax.set_xlabel("x1")
+    ax.set_ylabel("x2")
+
+    st.pyplot(fig)
+
+    if dim > 2:
+        fig = go.Figure()
+
+        fig.add_trace(
+            go.Surface(
+                x=X,
+                y=Y,
+                z=Z,
+                colorscale="Viridis",
+                showscale=True,
+                opacity=0.9
+            )
+        )
+
+        fig.add_trace(
+            go.Scatter3d(
+                x=[final_best_individual.genom[0]],
+                y=[final_best_individual.genom[1]],
+                z=[final_best_individual.genom[2]],
+                mode="markers",
+                marker=dict(
+                    size=2,
+                    color="red",
+                    symbol="circle"
+                ),
+                name="Najlepsze rozwiązanie"
+            )
+        )
+
+        fig.update_layout(
+            title="Wykres funkcji",
+            scene=dict(
+                xaxis_title="x1",
+                yaxis_title="x2",
+                zaxis_title="f(x)"
+            ),
+            margin=dict(l=0, r=0, b=0, t=40)
+        )
+
+        st.plotly_chart(fig, use_container_width=True)
