@@ -45,13 +45,21 @@ class GA(BaseAlgorithm):
 
     def run_with_progress(self, progress_bar=None):
         self.initialize()
-
+        self.population_history = []
         for ind in self.population:
             self.evaluate(ind)
 
         self.population.sort(key=lambda ind: ind.fitness)
         self.best_individual = self.population[0]
         self.history.append(self.best_individual.copy())
+
+        current_generation_data = []
+        for ind in self.population:
+            current_generation_data.append({
+                "genom": ind.genom.copy(),
+                "fitness": ind.fitness
+            })
+        self.population_history.append(current_generation_data)
 
         if progress_bar:
             progress_bar.progress(0, text="Inicjalizacja GA...")
@@ -80,6 +88,14 @@ class GA(BaseAlgorithm):
                 self.best_individual = self.population[0].copy()
 
             self.history.append(self.population[0].copy())
+
+            current_generation_data = []
+            for ind in self.population:
+                current_generation_data.append({
+                    "genom": ind.genom.copy(),
+                    "fitness": ind.fitness
+                })
+            self.population_history.append(current_generation_data)
 
             if progress_bar:
                 percent_complete = (gen + 1) / self.max_iter
