@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 
 from algorithms.EvolutionStrategy import ES
 from algorithms.GeneticAlgorithm import GA
+from algorithms.PSO import PSO
 from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6, EvalOnGrid
 from base.BaseAlgorithm import Individual
 
@@ -26,7 +27,10 @@ st.markdown("Wybierz algorytm (ES lub GA), skonfiguruj parametry i porównaj wyn
 
 with st.sidebar:
     st.header("1. Wybierz Algorytm")
-    alg_type = st.selectbox("Algorytm optymalizacyjny", ["Evolution Strategy (ES)", "Genetic Algorithm (GA)"])
+    alg_type = st.selectbox(
+        "Algorytm optymalizacyjny",
+        ["Evolution Strategy (ES)", "Genetic Algorithm (GA)", "Particle Swarm Optimization (PSO)"]
+    )
 
     st.divider()
     st.header("2. Wybierz Funkcję Celu")
@@ -75,6 +79,16 @@ with st.sidebar:
         params['crossover_prob'] = st.slider("Prawdopodobieństwo krzyżowania", 0.0, 1.0, 0.8)
         params['tournament_size'] = st.slider("Rozmiar turnieju", 2, 10, 3)
 
+    elif alg_type == "Particle Swarm Optimization (PSO)":
+        st.info("Ustawienia dla PSO")
+        params['pop_size'] = st.slider("Rozmiar roju (Liczba cząstek)", 10, 200, 30)
+        params['w'] = st.slider("Waga inercji (w)", 0.0, 1.0, 0.5,
+                                help="Jak bardzo cząstka chce zachować swój dotychczasowy pęd.")
+        params['c1'] = st.number_input("Współczynnik kognitywny (c1)", 0.0, 4.0, 1.5, step=0.1,
+                                       help="Zaufanie do własnej pamięci (p_best).")
+        params['c2'] = st.number_input("Współczynnik socjalny (c2)", 0.0, 4.0, 1.5, step=0.1,
+                                       help="Zaufanie do lidera roju (g_best).")
+
 if st.button("▶️ Uruchom Optymalizację", type="primary"):
     st.subheader(f"Wyniki: {alg_type} na funkcji {selected_func_name}")
 
@@ -92,6 +106,15 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
             mutation_prob=params['mutation_prob'],
             crossover_prob=params['crossover_prob'],
             tournament_size=params['tournament_size']
+        )
+
+    elif alg_type == "Particle Swarm Optimization (PSO)":
+        runner = PSO(
+            func=func, dim=dim, low=low, high=high, max_iter=max_iter,
+            pop_size=params['pop_size'],
+            w=params['w'],
+            c1=params['c1'],
+            c2=params['c2']
         )
 
     progress_bar = st.progress(0, text="Inicjalizacja...")
@@ -130,7 +153,11 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
                 "Fitness": f"{ind_obj.fitness:.6e}",
                 "Genom (x)": str(np.round(ind_obj.genom, 4)),
             }
-            if ind_obj.sigma is not None:
+#            if ind_obj.sigma is not None:
+#                row["Sigma"] = f"{ind_obj.sigma:.4f}"
+#            else:
+#                row["Sigma"] = "-"
+            if hasattr(ind_obj, 'sigma') and ind_obj.sigma is not None and ind_obj.sigma != 0:
                 row["Sigma"] = f"{ind_obj.sigma:.4f}"
             else:
                 row["Sigma"] = "-"
