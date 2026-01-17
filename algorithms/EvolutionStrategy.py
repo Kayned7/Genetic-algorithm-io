@@ -45,8 +45,17 @@ class ES(BaseAlgorithm):
 
     def run_with_progress(self, progress_bar=None): 
             self.initialize()
+            self.population_history = []
             for ind in self.population:
                 self.evaluate(ind)
+
+            current_generation_data = []
+            for ind in self.population:
+                current_generation_data.append({
+                    "genom": ind.genom.copy(),
+                    "fitness": ind.fitness
+                })
+            self.population_history.append(current_generation_data)
                 
             if progress_bar:
                 progress_bar.progress(1, text="Inicjalizacja zakończona...")
@@ -55,7 +64,15 @@ class ES(BaseAlgorithm):
                 children = self.generate_children()
                 self.select(children)
                 best = self.population[0]
-                self.history.append(best.copy()) 
+                self.history.append(best.copy())
+
+                current_generation_data = []
+                for ind in self.population:
+                    current_generation_data.append({
+                        "genom": ind.genom.copy(),
+                        "fitness": ind.fitness
+                    })
+                self.population_history.append(current_generation_data)
 
                 if progress_bar:
                     percent_complete = (gen + 1) / self.max_iter
