@@ -1,4 +1,3 @@
-# app.py
 import streamlit as st
 import numpy as np
 import pandas as pd
@@ -8,6 +7,7 @@ import plotly.graph_objects as go
 from algorithms.EvolutionStrategy import ES
 from algorithms.GeneticAlgorithm import GA
 from algorithms.PSO import PSO
+
 from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6, EvalOnGrid
 from base.BaseAlgorithm import Individual
 
@@ -23,7 +23,7 @@ FUNCTIONS = {
 st.set_page_config(layout="centered", page_title="Porównanie Algorytmów")
 
 st.title("🔬 Platforma Badawcza Algorytmów")
-st.markdown("Wybierz algorytm (ES lub GA), skonfiguruj parametry i porównaj wyniki.")
+st.markdown("Wybierz algorytm (ES, GA lub PSO), skonfiguruj parametry i porównaj wyniki.")
 
 with st.sidebar:
     st.header("1. Wybierz Algorytm")
@@ -60,7 +60,7 @@ with st.sidebar:
     with col2:
         high = st.number_input("Max (High)", value=default_high)
 
-    max_iter = st.number_input("Liczba Generacji", 10, 1000, 100)
+    max_iter = st.number_input("Liczba Generacji / Iteracji", 10, 1000, 100)
 
     st.divider()
     st.header("4. Parametry Algorytmu")
@@ -153,10 +153,6 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
                 "Fitness": f"{ind_obj.fitness:.6e}",
                 "Genom (x)": str(np.round(ind_obj.genom, 4)),
             }
-#            if ind_obj.sigma is not None:
-#                row["Sigma"] = f"{ind_obj.sigma:.4f}"
-#            else:
-#                row["Sigma"] = "-"
             if hasattr(ind_obj, 'sigma') and ind_obj.sigma is not None and ind_obj.sigma != 0:
                 row["Sigma"] = f"{ind_obj.sigma:.4f}"
             else:
@@ -167,6 +163,7 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
         detailed_history_df = pd.DataFrame(detailed_history_data)
         st.dataframe(detailed_history_df, width='stretch')
 
+
     x = np.linspace(low, high, 300)
     y = np.linspace(low, high, 300)
     X, Y = np.meshgrid(x, y)
@@ -176,15 +173,16 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
     fig, ax = plt.subplots(figsize=(6, 5))
     cs = ax.contourf(X, Y, Z, levels=50, cmap="viridis")
     fig.colorbar(cs)
+
     ax.scatter(
         final_best_individual.genom[0],
         final_best_individual.genom[1],
         color="red",
-        s=2,
+        s=5,
         marker=".",
         label="Najlepsze rozwiązanie"
     )
-    ax.set_title("Wykres funkcji")
+    ax.set_title("Wykres funkcji (rzut 2D)")
     ax.set_xlabel("x1")
     ax.set_ylabel("x2")
 
@@ -211,7 +209,7 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
                 z=[final_best_individual.genom[2]],
                 mode="markers",
                 marker=dict(
-                    size=2,
+                    size=5,
                     color="red",
                     symbol="circle"
                 ),
@@ -220,13 +218,83 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
         )
 
         fig.update_layout(
-            title="Wykres funkcji",
+            title="Wykres przestrzeni rozwiązań (x1, x2, x3)",
             scene=dict(
                 xaxis_title="x1",
                 yaxis_title="x2",
-                zaxis_title="f(x)"
+                zaxis_title="x3"
             ),
             margin=dict(l=0, r=0, b=0, t=40)
         )
 
         st.plotly_chart(fig, use_container_width=True)
+
+    st.divider()
+    st.subheader("🎬 Dynamika Populacji (Animacja)")
+    st.info("Poniższy wykres pokazuje, jak cała populacja przemieszczała się w poszukiwaniu minimum.")
+
+    if hasattr(runner, 'population_history') and runner.population_history:
+
+        scatter_data = []
+
+        step = 1 if max_iter <= 50 else max_iter // 50
+
+        for gen_idx, pop_data in enumerate(runner.population_history):
+            if gen_idx % step == 0:
+                for i, ind_data in enumerate(pop_data):
+                    x_val = ind_data['genom'][0]
+                    y_val = ind_data['genom'][1]
+                    fit_val = ind_data['fitness']
+
+                    scatter_data.append({
+                        "Generacja": gen_idx,
+                        "ID Cząstki": i,
+                        "x": x_val,
+                        "y": y_val,
+                        "Fitness": fit_val
+                    })
+
+        df_anim = pd.DataFrame(scatter_data)
+
+        import plotly.express as px
+
+        margin_x = (high - low) * 0.1
+        range_x = [low - margin_x, high + margin_x]
+        range_y = [low - margin_x, high + margin_x]
+
+        fig_anim = px.scatter(
+            df_anim,
+            x="x",
+            y="y",
+            animation_frame="Generacja",
+            animation_group="ID Cząstki",
+            color="Fitness",
+            range_x=range_x,
+            range_y=range_y,
+            hover_name="ID Cząstki",
+            title=f"Ewolucja populacji - {alg_type}",
+            color_continuous_scale="Viridis_r"
+        )
+
+        fig_anim.layout.updatemenus[0].buttons[0].args[1]["frame"]["duration"] = 100
+        fig_anim.update_traces(marker=dict(size=8, line=dict(width=1, color='DarkSlateGrey')))
+        fig_anim.update_layout(
+            xaxis_title="Wymiar x1",
+            yaxis_title="Wymiar x2"
+        )
+
+        fig_anim.add_trace(
+            go.Scatter(
+                x=[0] if selected_func_name in ["Sphere", "Rastrigin", "Griewank", "Rosenbrock"] else [0],
+                y=[0],
+                mode="markers",
+                marker=dict(symbol="x", color="red", size=15),
+                name="Cel (Optimum)",
+                showlegend=False
+            )
+        )
+
+        st.plotly_chart(fig_anim, use_container_width=True)
+
+    else:
+        st.warning("Blad symulacji.")
