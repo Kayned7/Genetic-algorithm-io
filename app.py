@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 from algorithms.EvolutionStrategy import ES
 from algorithms.GeneticAlgorithm import GA
 from algorithms.PSO import PSO
+from algorithms.DifferentialEvolution import DifferentialEvolution
 
 from base.TestFunctions import Sphere, Rastrigin, Griewank, Rosenbrock, Beale, BukinN6, EvalOnGrid
 from base.BaseAlgorithm import Individual
@@ -29,7 +30,7 @@ with st.sidebar:
     st.header("1. Wybierz Algorytm")
     alg_type = st.selectbox(
         "Algorytm optymalizacyjny",
-        ["Evolution Strategy (ES)", "Genetic Algorithm (GA)", "Particle Swarm Optimization (PSO)"]
+        ["Evolution Strategy (ES)", "Genetic Algorithm (GA)", "Particle Swarm Optimization (PSO)", "Differential Evolution (DE)"]
     )
 
     st.divider()
@@ -87,7 +88,13 @@ with st.sidebar:
         params['c1'] = st.number_input("Współczynnik kognitywny (c1)", 0.0, 4.0, 1.5, step=0.1,
                                        help="Zaufanie do własnej pamięci (p_best).")
         params['c2'] = st.number_input("Współczynnik socjalny (c2)", 0.0, 4.0, 1.5, step=0.1,
-                                       help="Zaufanie do lidera roju (g_best).")
+                                      help="Zaufanie do lidera roju (g_best).")
+
+    elif alg_type == "Differential Evolution (DE)":
+        st.info("Ustawienia dla DE")
+        params['pop_size'] = st.slider("Rozmiar populacji (NP)", 10, 200, 50)
+        params['F'] = st.slider("Współczynnik mutacji (F)", 0.0, 2.0, 0.5, step=0.01)
+        params['CR'] = st.slider("Prawdopodobieństwo krzyżowania (CR)", 0.0, 1.0, 0.7, step=0.05)
 
 if st.button("▶️ Uruchom Optymalizację", type="primary"):
     st.subheader(f"Wyniki: {alg_type} na funkcji {selected_func_name}")
@@ -115,6 +122,13 @@ if st.button("▶️ Uruchom Optymalizację", type="primary"):
             w=params['w'],
             c1=params['c1'],
             c2=params['c2']
+        )
+    elif alg_type == "Differential Evolution (DE)":
+        runner = DifferentialEvolution(
+            func=func, dim=dim, low=low, high=high, max_iter=max_iter,
+            pop_size=params['pop_size'],
+            F=params['F'],
+            CR=params['CR']
         )
 
     progress_bar = st.progress(0, text="Inicjalizacja...")
