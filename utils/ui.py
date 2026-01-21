@@ -37,7 +37,7 @@ def render_problem_sidebar(on_change_callback=None):
         st.sidebar.warning("Ta funkcja wymusza D=2.")
         dim = 2
     else:
-        dim = st.sidebar.slider("Wymiarowość (D)", 1, 20, 2, on_change=on_change_callback)
+        dim = st.sidebar.slider("Wymiarowość (D)", 2, 20, 2, on_change=on_change_callback)
 
     default_low, default_high = (-15.0, 5.0) if selected_func_name == "Bukin N.6" else (-5.0, 5.0)
     c1, c2 = st.sidebar.columns(2)

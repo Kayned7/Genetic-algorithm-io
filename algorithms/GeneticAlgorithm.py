@@ -21,7 +21,7 @@ class GA(BaseAlgorithm):
 
     def tournament_selection(self):
         candidates = np.random.choice(self.population, self.tournament_size, replace=False)
-        best = min(candidates, key=lambda x: x.fitness)
+        best = max(candidates, key=lambda x: x.fitness)
         return best
 
     def crossover(self, parent1, parent2):

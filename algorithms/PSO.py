@@ -51,6 +51,7 @@ class PSO(BaseAlgorithm):
 
         # Ograniczenie do granic (ściany pudełka)
         # Jeśli cząstka wyleci, przycinamy ją do krawędzi (można też odbijać wektor prędkości)
+        # zakomentowane dla testow
         ind.genom = np.clip(ind.genom, self.low, self.high)
 
     def run_with_progress(self, progress_bar=None):
