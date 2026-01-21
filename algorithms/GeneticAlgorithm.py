@@ -21,7 +21,7 @@ class GA(BaseAlgorithm):
 
     def tournament_selection(self):
         candidates = np.random.choice(self.population, self.tournament_size, replace=False)
-        best = max(candidates, key=lambda x: x.fitness)
+        best = min(candidates, key=lambda x: x.fitness)
         return best
 
     def crossover(self, parent1, parent2):
@@ -108,5 +108,4 @@ class GA(BaseAlgorithm):
         return self.best_individual
 
     def run(self):
-        """Wersja bez paska postępu (wymagana przez klasę abstrakcyjną)."""
         return self.run_with_progress(progress_bar=None)

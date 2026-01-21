@@ -43,11 +43,39 @@ class ES(BaseAlgorithm):
         combined.sort(key=lambda x: x.fitness)
         self.population = combined[:self.mu]
 
-    def run_with_progress(self, progress_bar=None): 
-            self.initialize()
-            self.population_history = []
-            for ind in self.population:
-                self.evaluate(ind)
+    def run_with_progress(self, progress_bar=None):
+        self.initialize()
+        self.population_history = []
+
+        for ind in self.population:
+            self.evaluate(ind)
+
+        self.population.sort(key=lambda ind: ind.fitness)
+        self.best_individual = self.population[0].copy()
+
+        self.history.append(self.best_individual.copy())
+
+        current_generation_data = []
+        for ind in self.population:
+            current_generation_data.append({
+                "genom": ind.genom.copy(),
+                "fitness": ind.fitness
+            })
+        self.population_history.append(current_generation_data)
+
+        if progress_bar:
+            progress_bar.progress(0, text="Inicjalizacja zakończona...")
+
+        for gen in range(self.max_iter):
+            children = self.generate_children()
+            self.select(children)
+
+            best = self.population[0]
+
+            if best.fitness < self.best_individual.fitness:
+                self.best_individual = best.copy()
+
+            self.history.append(best.copy())
 
             current_generation_data = []
             for ind in self.population:
@@ -56,37 +84,17 @@ class ES(BaseAlgorithm):
                     "fitness": ind.fitness
                 })
             self.population_history.append(current_generation_data)
-                
+
             if progress_bar:
-                progress_bar.progress(1, text="Inicjalizacja zakończona...")
+                percent_complete = (gen + 1) / self.max_iter
+                progress_bar.progress(percent_complete,
+                                      text=f"Generacja {gen + 1}/{self.max_iter} | Best: {self.best_individual.fitness:.4e}")
 
-            for gen in range(self.max_iter):
-                children = self.generate_children()
-                self.select(children)
-                best = self.population[0]
-                self.history.append(best.copy())
+        if progress_bar:
+            progress_bar.progress(100, text="Optymalizacja zakończona.")
 
-                current_generation_data = []
-                for ind in self.population:
-                    current_generation_data.append({
-                        "genom": ind.genom.copy(),
-                        "fitness": ind.fitness
-                    })
-                self.population_history.append(current_generation_data)
+        return self.best_individual
 
-                if progress_bar:
-                    percent_complete = (gen + 1) / self.max_iter
-                    progress_bar.progress(percent_complete, text=f"Generacja {gen+1}/{self.max_iter} | Best: {best.fitness:.4e}")
-
-            self.best_individual = self.population[0]
-            
-            # Ustawienie paska postępu na 100%
-            if progress_bar:
-                progress_bar.progress(100, text="Optymalizacja zakończona.")
-                
-            return self.best_individual
-
-    # WAŻNE: Wymagana jest też oryginalna metoda run, jeśli jest abstrakcyjna
     def run(self):
         return self.run_with_progress(progress_bar=None)
 
