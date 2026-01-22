@@ -11,11 +11,11 @@ from utils.plots import  plot_2d, plot_3d, plot_population_history
 from utils.factory import get_runner
 
 
-# --- CONFIG ---
+# Konfiguracja
 st.set_page_config(layout="wide", page_title="Platforma Optymalizacji")
 st.markdown(CSS_STYLES, unsafe_allow_html=True)
 
-# PAGE 1: POJEDYNCZA ANALIZA
+# Pojedyncza analiza
 def view_single_analysis():
     reset_comparison_state()
     st.title("🔬 Platforma Badawcza Algorytmów")
@@ -92,7 +92,7 @@ def view_single_analysis():
 
 
 
-# PAGE 2: PORÓWNANIE
+# Porównianie
 
 def view_comparison():
     func, func_name, dim, low, high, max_iter = render_problem_sidebar(on_change_callback=reset_comparison_state)

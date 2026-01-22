@@ -45,6 +45,8 @@ def render_problem_sidebar(on_change_callback=None):
         low = st.number_input("Min", value=default_low)
     with c2:
         high = st.number_input("Max", value=default_high)
+    if low >= high:
+        st.sidebar.warning("Odwrócone granice (Min > Max). Zostaną one automatycznie zamienione miejscami.")
     max_iter = st.sidebar.number_input("Liczba Generacji", 10, 2000, 100)
 
     return func, selected_func_name, dim, low, high, max_iter
