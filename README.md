@@ -74,7 +74,7 @@ Narzędzie umożliwia przeprowadzanie pojedynczych symulacji oraz bezpośrednie 
 ├── visualization/              # Logika wykresów Plotly
 ├── app.py                      # Główny plik aplikacji Streamlit
 └── requirements.txt            # Zależności
-
+```
 
 ## 🇬🇧 About the Project
 **Algorithm Research Platform** is an interactive web tool designed for visualizing, analyzing, and comparing heuristic (gradient-free) optimization algorithms. The application allows users to gain a deep understanding of population dynamics and the convergence of various optimization methods in real-time.
@@ -145,3 +145,4 @@ The tool supports running single simulations as well as direct "Head-to-Head" co
 ├── visualization/              # Plotly plotting logic
 ├── app.py                      # Main Streamlit application file
 └── requirements.txt            # Dependencies
+```
