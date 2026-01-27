@@ -27,8 +27,8 @@ Narzędzie umożliwia przeprowadzanie pojedynczych symulacji oraz bezpośrednie 
 #### 2. Wizualizacja Wyników (2D i 3D)
 | Rzut 2D (Heatmapa) | Wizualizacja 3D |
 |:---:|:---:|
-| ![2D Plot]<img width="658" height="495" alt="Zrzut ekranu 2026-01-27 191006" src="https://github.com/user-attachments/assets/5aa5abd4-4585-4d66-94ef-4c3e17cdf7bd" />
- | ![3D Plot]<img width="1360" height="617" alt="Zrzut ekranu 2026-01-27 191254" src="https://github.com/user-attachments/assets/3fae3b26-0315-4da9-ad09-c83494c1d943" />
+| ![2D Plot](<img width="658" height="495" alt="Zrzut ekranu 2026-01-27 191006" src="https://github.com/user-attachments/assets/5aa5abd4-4585-4d66-94ef-4c3e17cdf7bd" />)
+ | ![3D Plot](<img width="1360" height="617" alt="Zrzut ekranu 2026-01-27 191254" src="https://github.com/user-attachments/assets/3fae3b26-0315-4da9-ad09-c83494c1d943" />)
  |
 
 #### 3. Dynamika i Zbieżność
