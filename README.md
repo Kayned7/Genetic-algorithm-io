@@ -27,22 +27,17 @@ Narzędzie umożliwia przeprowadzanie pojedynczych symulacji oraz bezpośrednie 
 #### 2. Wizualizacja Wyników (2D i 3D)
 | Rzut 2D (Heatmapa) | Wizualizacja 3D |
 |:---:|:---:|
-| ![2D Plot](<img width="658" height="495" alt="Zrzut ekranu 2026-01-27 191006" src="https://github.com/user-attachments/assets/5aa5abd4-4585-4d66-94ef-4c3e17cdf7bd" />)
- | ![3D Plot](<img width="1360" height="617" alt="Zrzut ekranu 2026-01-27 191254" src="https://github.com/user-attachments/assets/3fae3b26-0315-4da9-ad09-c83494c1d943" />)
- |
+| ![2D Plot](<img width="658" height="495" alt="Zrzut ekranu 2026-01-27 191006" src="https://github.com/user-attachments/assets/5aa5abd4-4585-4d66-94ef-4c3e17cdf7bd" />)| ![3D Plot](<img width="1360" height="617" alt="Zrzut ekranu 2026-01-27 191254" src="https://github.com/user-attachments/assets/3fae3b26-0315-4da9-ad09-c83494c1d943" />)|
 
 #### 3. Dynamika i Zbieżność
-![Convergence](<img width="1377" height="805" alt="Zrzut ekranu 2026-01-27 190953" src="https://github.com/user-attachments/assets/2a39a441-be2d-485d-84cf-c192b68c0eba" />
-)
+<img width="1377" height="805" alt="Zrzut ekranu 2026-01-27 190953" src="https://github.com/user-attachments/assets/2a39a441-be2d-485d-84cf-c192b68c0eba" />
 *Wykres zbieżności funkcji dopasowania (Fitness) w czasie.*
 
 #### 4. Tryb Porównania (Benchmark)
-![Comparison Setup](<img width="1768" height="753" alt="Zrzut ekranu 2026-01-27 191130" src="https://github.com/user-attachments/assets/e4663282-58ff-4ac5-ae3d-097e3011f913" />
-)
+<img width="1768" height="753" alt="Zrzut ekranu 2026-01-27 191130" src="https://github.com/user-attachments/assets/e4663282-58ff-4ac5-ae3d-097e3011f913" />
 *Konfiguracja porównania dwóch algorytmów.*
 
-![Comparison Result](<img width="1385" height="754" alt="Zrzut ekranu 2026-01-27 191158" src="https://github.com/user-attachments/assets/b6ebad96-490c-456a-a36b-e138c41abdca" />
-)
+<img width="1385" height="754" alt="Zrzut ekranu 2026-01-27 191158" src="https://github.com/user-attachments/assets/b6ebad96-490c-456a-a36b-e138c41abdca" />
 *Porównanie szybkości zbieżności (np. ES vs GA).*
 
 ---
@@ -59,7 +54,11 @@ Narzędzie umożliwia przeprowadzanie pojedynczych symulacji oraz bezpośrednie 
     ```bash
     streamlit run app.py --server.port 5998
     ```
-3.  Otwórz w przeglądarce: `http://localhost:5998`
+    Możliwe jest także ustawienie własnego portu, wystarczy wtedy zmienić cztery ostatnie cyfry polecenia:
+    ```bash
+    streamlit run app.py --server.port ABCD
+    ```
+3.  Otwórz w przeglądarce (lub inny wybrany port): `http://localhost:5998`
 
 ### 📂 Struktura Projektu
 
