@@ -74,3 +74,74 @@ Narzędzie umożliwia przeprowadzanie pojedynczych symulacji oraz bezpośrednie 
 ├── visualization/              # Logika wykresów Plotly
 ├── app.py                      # Główny plik aplikacji Streamlit
 └── requirements.txt            # Zależności
+
+
+## 🇬🇧 About the Project
+**Algorithm Research Platform** is an interactive web tool designed for visualizing, analyzing, and comparing heuristic (gradient-free) optimization algorithms. The application allows users to gain a deep understanding of population dynamics and the convergence of various optimization methods in real-time.
+
+The tool supports running single simulations as well as direct "Head-to-Head" comparisons of two different algorithms on selected test functions (e.g., Sphere, Rastrigin).
+
+### Key Features
+* **Algorithms:** Genetic Algorithm (GA), Evolution Strategy (ES), Particle Swarm Optimization (PSO), Differential Evolution (DE).
+* **Visualization:** Convergence plots (Fitness), 2D projections with heatmaps, spatial 3D visualization.
+* **Comparison:** "Benchmark" mode allowing side-by-side comparison of two algorithms.
+* **Configuration:** Full parameterization (population size, mutation, inertia, $\mu, \lambda$).
+
+### Gallery
+
+#### 1. Configuration and Single Analysis
+<img width="1840" height="842" alt="Screenshot 2026-01-27 190846" src="https://github.com/user-attachments/assets/642d4799-f554-422e-97d9-9c6f2bc42609" />
+
+*Main application panel and objective function selection.*
+
+#### 2. Results Visualization (2D and 3D)
+| 2D Projection (Heatmap) | 3D Visualization |
+|:---:|:---:|
+| <img width="658" height="495" alt="Screenshot 2026-01-27 191006" src="https://github.com/user-attachments/assets/5aa5abd4-4585-4d66-94ef-4c3e17cdf7bd" />| <img width="1360" height="617" alt="Screenshot 2026-01-27 191254" src="https://github.com/user-attachments/assets/3fae3b26-0315-4da9-ad09-c83494c1d943" />|
+
+#### 3. Dynamics and Convergence
+<img width="1377" height="805" alt="Screenshot 2026-01-27 190953" src="https://github.com/user-attachments/assets/2a39a441-be2d-485d-84cf-c192b68c0eba" />
+
+*Fitness function convergence plot over time.*
+
+#### 4. Comparison Mode (Benchmark)
+<img width="1768" height="753" alt="Screenshot 2026-01-27 191130" src="https://github.com/user-attachments/assets/e4663282-58ff-4ac5-ae3d-097e3011f913" />
+
+*Configuration for comparing two algorithms.*
+
+<img width="1385" height="754" alt="Screenshot 2026-01-27 191158" src="https://github.com/user-attachments/assets/b6ebad96-490c-456a-a36b-e138c41abdca" />
+
+*Convergence speed comparison (e.g., ES vs GA).*
+
+---
+
+### Installation and Usage
+
+1.  **Requirements:** Python 3.8+ and the libraries listed in `requirements.txt`.
+    ```bash
+    pip install streamlit numpy pandas plotly
+    ```
+
+2.  **Execution:**
+    The application defaults to port 5998. Run it using the following command:
+    ```bash
+    streamlit run app.py --server.port 5998
+    ```
+    You can also set a custom port by changing the last four digits of the command:
+    ```bash
+    streamlit run app.py --server.port ABCD
+    ```
+
+3.  Open in your browser (or use your selected port): `http://localhost:5998`
+
+### Project Structure
+
+```text
+├── algorithms/                 # Implementation of algorithms (GA, ES, PSO, DE)
+│   ├── base_algorithm.py
+│   ├── genetic_algorithm.py
+│   ├── ...
+├── functions/                  # Test function definitions (Sphere, Rastrigin, etc.)
+├── visualization/              # Plotly plotting logic
+├── app.py                      # Main Streamlit application file
+└── requirements.txt            # Dependencies
